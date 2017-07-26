@@ -11,3 +11,5 @@ Cassandra Python driver
 SciKit Learn
 
 Flask
+
+Requests
