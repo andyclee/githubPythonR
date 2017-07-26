@@ -5,6 +5,9 @@ Made with Python 3.5
 
 ##Dependencies
 
+
 Cassandra Python driver
+
 SciKit Learn
+
 Flask
