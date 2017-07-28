@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Github Repo Count Predictor</title>
+</head>
+<body>
+<h1>Github Repo Count Predictor</h1>
+<br>
+Getting new data is significantly slower than using old data
+
+<form action="{{ url_for('getData') }}" method="post">
+<input type="checkbox" name="newData" value="Get new data">
+    <input type="submit" value="Get Predictions">
+</form>
+</body>
+</html>

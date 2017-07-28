@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Github Repo Count Predictor: Results</title>
+</head>
+<body>
+<table>
+    {% for lang, preds in result.iteritems() %}
+        <tr>
+        <td>{{ lang }}</td>
+
+        <td>
+            <table>
+                {% for year in range(yearrange) %}
+                    <tr>
+                        <th> {{ years[year] }} </th>
+                        <td> {{ preds[year] }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </td>
+
+        </tr>
+    {% endfor % }
+</table>
+</body>
+</html>
