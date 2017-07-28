@@ -20,7 +20,8 @@ def getSleepTime():
     reqJSON = json.loads(req.content.decode("utf-8"))
 
     resetTime = int(reqJSON['resources']['search']['reset'])
-    timeLeft = time.time() - resetTime
+    curTime = time.time()
+    timeLeft = resetTime - curTime
 
     if (timeLeft < 0):
         timeLeft = 0
@@ -35,6 +36,17 @@ githubStartYear = 2008
 lastYear = datetime.datetime.now().year - 1
 yearRange = range(githubStartYear, lastYear)
 
+"""
+Try catch logic could also be included here but in order to minimize duplicate code
+it is not
+"""
+def querySearch(query):
+    req = requests.get(query)
+    reqJSON = req.json()
+
+    count = reqJSON['total_count']
+    return count
+
 #Returns array of tuples containing annual counts for all repos
 def getTotalAnnual():
     reposPerYear = []
@@ -42,61 +54,47 @@ def getTotalAnnual():
     for year in yearRange:
         dateQuery = "created:{0}-01-01..{0}-12-31".format(str(year))
         query = queryURL+dateQuery
-        req = requests.get(query)
         
-        #Query is returned as a byte string so decode it then load as JSON
-        reqJSON = json.loads(req.content.decode("utf-8"))
         try:
-            count = reqJSON['total_count']
+            count = querySearch(query)
             reposPerYear.append((year, count))
         except KeyError:
-            time.sleep(getSleepTime())
-            count = reqJSON['total_count']
+            time.sleep(getSleepTime() + 1.0)
+            count = querySearch(query)
             reposPerYear.append((year, count))
 
     return reposPerYear
 
-#Returns array of tuples containing annual counts for all python repos
-def getPythonAnnual():
-    pythonPerYear = []
+#Helper method for getLangAnnual, validates language selected
+def isValidLang(language):
+    langQuery = "language:{0}".format(language.lower())
+    query = queryURL + langQuery
+    req = requests.get(query)
+    reqJSON = req.json()
+
+    if 'errors' in reqJSON:
+        return False
+    return True
+
+#Returns array of tuples containing annual counts for all repos with a certain
+#language
+def getLangAnnual(language):
+    if not isValidLang(language):
+         return { 'error' : 'Language invalid' }
+    
+    langPerYear = []
 
     for year in yearRange:
         dateQuery = "created:{0}-01-01..{0}-12-31".format(str(year))
-        pythonQuery = "language:python"
-        query = queryURL + dateQuery + "+" + pythonQuery
-        req = requests.get(query)
-
-        reqJSON = json.loads(req.content.decode("utf-8"))
+        langQuery = "language:{0}".format(language.lower())
+        query = queryURL + dateQuery + "+" + langQuery
 
         try:
-            count = reqJSON['total_count']
-            pythonPerYear.append((year, count))
+            count = querySearch(query)
+            langPerYear.append((year, count))
         except KeyError:
-            time.sleep(getSleepTime())
-            count = reqJSON['total_count']
-            pythonPerYear.append((year, count))
+            time.sleep(getSleepTime() + 1.0)
+            count = querySearch(query)
+            langPerYear.append((year, count))
 
-    return pythonPerYear
-
-def getRAnnual():
-    rPerYear = []
-
-    for year in yearRange:
-        dateQuery = "created:{0}-01-01..{0}-12-31".format(str(year))
-        pythonQuery = "language:r"
-        query = queryURL + dateQuery + "+" + pythonQuery
-        req = requests.get(query)
-
-        reqJSON = json.loads(req.content.decode("utf-8"))
-
-        try:
-            count = reqJSON['total_count']
-            rPerYear.append((year, count))
-        except KeyError:
-            time.sleep(getSleepTime())
-            count = reqJSON['total_count']
-            rPerYear.append((year, count))
-        
-        rPerYear.append((year, count))
-
-    return rPerYear
+    return langPerYear
