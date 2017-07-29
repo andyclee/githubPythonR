@@ -6,7 +6,7 @@
 </head>
 <body>
 <table>
-    {% for lang, preds in result.iteritems() %}
+    {% for lang, preds in result.items() %}
         <tr>
         <td>{{ lang }}</td>
 
@@ -22,7 +22,7 @@
         </td>
 
         </tr>
-    {% endfor % }
+    {% endfor %}
 </table>
 </body>
 </html>
